@@ -17,6 +17,7 @@ enum {LOGGING_ERROR=0, LOGGING_WARN, LOGGING_NOTICE, LOGGING_INFO, LOGGING_DEBUG
 typedef struct logItem {
     uint8_t level;
     uint32_t timestamp;
+    uint32_t line;
     char tag[MAX_TAG_SIZE];
     char log_message[MAX_LOG_SIZE];
 } logItem;
@@ -32,7 +33,7 @@ typedef struct ringBuffer {
 
 class Logging {
     public:
-    void log(const char *tag, uint8_t level, uint32_t timestamp, const char *format, ...);
+    void log(const char *tag, uint8_t level, uint32_t timestamp, uint32_t line, const char *format, ...);
 
     void loop();
 
@@ -44,7 +45,7 @@ class Logging {
     bool _buffer_full() { return (((this->_ring_buffer.head + 1) & (MAX_LOG_BUFFER_DEPTH - 1)) == this->_ring_buffer.tail); }
     bool _buffer_empty() { return (this->_ring_buffer.tail == this->_ring_buffer.head); }
     uint8_t _buffer_next(uint8_t buffer) { return (buffer + 1) & (MAX_LOG_BUFFER_DEPTH - 1); }
-    void _xmit_logitem(const char *tag, uint8_t level, uint32_t timestamp, const char *str);
+    void _xmit_logitem(const char *tag, uint8_t level, uint32_t timestamp, const char *str, uint32_t line);
 };
 
 } // End Namespace LOGGING

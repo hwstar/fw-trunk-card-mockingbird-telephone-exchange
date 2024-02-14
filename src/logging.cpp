@@ -13,7 +13,7 @@ const char *log_level_strings[MAX_LOG_LEVEL] = {
 };
 
 
-void Logging::_xmit_logitem(const char *tag, uint8_t level, uint32_t timestamp, const char *str) {
+void Logging::_xmit_logitem(const char *tag, uint8_t level, uint32_t timestamp, const char *str, uint32_t line) {
     if(level > MAX_LOG_LEVEL) {
         level = 0; // Protect against bad log level being passed in.
     }
@@ -26,11 +26,11 @@ void Logging::_xmit_logitem(const char *tag, uint8_t level, uint32_t timestamp, 
     uint8_t seconds = timestamp / 1000;
     timestamp %= 1000;
 
-    Serial.printf("[%u:%02u:%02u.%03u] LOG_%s(%s):%s\r\n", hours, minutes, seconds, timestamp, log_level_strings[level], tag, str);
+    Serial.printf("[%u:%02u:%02u.%03u] LOG_%s(%s.%d):%s\r\n", hours, minutes, seconds, timestamp, log_level_strings[level], tag, line, str);
 }
 
 
-void Logging::log(const char *tag, uint8_t level, uint32_t timestamp, const char *format, ...) {
+void Logging::log(const char *tag, uint8_t level, uint32_t timestamp, uint32_t line, const char *format, ...) {
    
 
     if(this->_buffer_full()){
@@ -47,6 +47,7 @@ void Logging::log(const char *tag, uint8_t level, uint32_t timestamp, const char
         li->tag[MAX_TAG_SIZE - 1] = 0;
         li->level = level;
         li->timestamp = timestamp;
+        li->line = line;
         // Advance to next position in ring buffer
         _ring_buffer.head = this->_buffer_next(_ring_buffer.head);
     }
@@ -57,14 +58,14 @@ void Logging::log(const char *tag, uint8_t level, uint32_t timestamp, const char
 void Logging::loop() {
 
     if(this->_ring_buffer.overflow_error) {
-        this->_xmit_logitem(TAG, LOGGING_ERROR, millis(), "Log Buffer Overflow");
+        this->_xmit_logitem(TAG, LOGGING_ERROR, millis(), "Log Buffer Overflow", __LINE__);
         this->_ring_buffer.overflow_error = false;
 
     }
     else { 
         while(!this->_buffer_empty()) {
             logItem *li = &this->_ring_buffer.messages[_ring_buffer.tail];
-            this->_xmit_logitem(li->tag, li->level, li->timestamp, li->log_message);
+            this->_xmit_logitem(li->tag, li->level, li->timestamp, li->log_message, li->line);
             // Advance to next position in the ring buffer
             _ring_buffer.tail = this->_buffer_next(_ring_buffer.tail);
         }

@@ -4,7 +4,7 @@
 
 #define TAG "main"
 
-uint8_t I2c_address = 0x30;
+uint8_t I2c_address = 0x20;
 HardwareTimer TickTimer(TIM4);
 ENM::ENM Enm;
 LOGGING::Logging Log;
