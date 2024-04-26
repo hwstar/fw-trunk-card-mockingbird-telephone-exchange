@@ -112,7 +112,12 @@ bool ENM::_request_service(uint8_t event) {
 
 void ENM::_main_handler() {
   for( int i = 0; i < LINE_COUNT; i++) {
-    
+
+    if(this->_mh_state != this->_mh_state_prev) {
+      this->_mh_state_prev = this->_mh_state;
+      /* LOG_DEBUG(TAG, "New state: %d", this->_mh_state); */
+    }
+
     switch(this->_mh_state) {
 
       case MHS_IDLE:
@@ -486,7 +491,7 @@ void ENM::setup() {
   digitalWrite(ATTEN, LOW);
 
   
-
+  this->_mh_state = MHS_IDLE;
   this->_test_mode = 0; 
 
 }
@@ -534,7 +539,7 @@ void ENM::loop() {
 
         case REG_DROP_CALL: // Drop connected call
           if((this->_mh_state == MHS_IN_INCOMING_CALL) || (this->_mh_state == MHS_WAIT_SEND_ADDRESS_INFO) 
-          || (this->_mh_state = MHS_WAIT_INCOMING_CONNECT) || (this->_mh_state = MHS_IN_OUTGOING_CALL)) {
+          || (this->_mh_state == MHS_WAIT_INCOMING_CONNECT) || (this->_mh_state == MHS_IN_OUTGOING_CALL)) {
             this->_mh_state_advance = REG_DROP_CALL;
           }
           break;

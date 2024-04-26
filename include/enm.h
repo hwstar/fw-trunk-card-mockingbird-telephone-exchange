@@ -70,20 +70,15 @@ protected:
     bool _event_buffer_empty() { return (this->_event_buffer.tail == this->_event_buffer.head); }
     uint8_t _event_buffer_next(uint8_t buffer) { return (buffer + 1) & (EVENT_BUFFER_DEPTH - 1); }
     bool _request_service(uint8_t event);
-
-
     void _main_handler();
 
  
-
-
-  
-
     volatile bool _i2c_read_data_ready;
     volatile uint8_t _mh_state_advance;
     uint8_t _service_ticks;
     uint8_t _i2c_address;
     volatile uint8_t _mh_state;
+    volatile uint8_t _mh_state_prev;
     volatile uint8_t _test_mode;
     volatile uint8_t _i2c_register_address;
     volatile uint8_t _i2c_read_data_length;
