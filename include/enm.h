@@ -28,7 +28,6 @@ const uint8_t EVENT_BUFFER_DEPTH = 4;
 const uint8_t EVENT_BUFFER_SIZE = 2;
 const uint8_t MAX_I2C_DATA_LENGTH = 3;
 
-
 // Software timers
 enum {TIMER_WINK=0, TIMER_WINK_WAIT, TIMER_SENSE, TIMER_GUARD, TIMER_MEAS_WINK, MAX_TIMERS};
 // Events sent to main CPU
@@ -37,7 +36,7 @@ enum {EV_NONE=0, EV_REQUEST_IR=1, EV_CALL_DROPPED=2, EV_NO_WINK=3, EV_SEND_ADDR_
 enum {TM_NONE=0, TM_STANDALONE=1};
 // I2C registers
 enum {REG_GET_EVENT=0, REG_NONE=0, REG_GET_BUSY_STATUS=1, REG_SEIZE_TRUNK=2, REG_SEND_WINK=3, REG_INCOMING_CONNECTED=4,
-REG_DROP_CALL=5, REG_OUTGOING_ADDR_COMPLETE=6};
+REG_DROP_CALL=5, REG_OUTGOING_ADDR_COMPLETE=6, REG_RESET=7};
 // Main Handler States
 enum {MHS_IDLE=0, MHS_PREWINK_WAIT=1, MHS_WAIT_IR=2, MHS_SEND_WINK=3, MHS_SEND_WINK_WAIT=4, MHS_WAIT_ADDRESS_COMPLETE=5, 
 MHS_WAIT_MF_ADDR=6, MHS_WAIT_INCOMING_CONNECT=7, MHS_ANSWER_SUPV=8, MHS_IN_INCOMING_CALL=9, MHS_END_INCOMING_CALL=10, MHS_WAIT_SENSE_INACTIVE=11,
@@ -71,6 +70,7 @@ protected:
     uint8_t _event_buffer_next(uint8_t buffer) { return (buffer + 1) & (EVENT_BUFFER_DEPTH - 1); }
     bool _request_service(uint8_t event);
     void _main_handler();
+    void _reset_trunk();
 
  
     volatile bool _i2c_read_data_ready;
