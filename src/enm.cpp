@@ -544,7 +544,8 @@ void ENM::loop() {
 
         case REG_DROP_CALL: // Drop connected call
           if((this->_mh_state == MHS_IN_INCOMING_CALL) || (this->_mh_state == MHS_WAIT_SEND_ADDRESS_INFO) 
-          || (this->_mh_state == MHS_WAIT_INCOMING_CONNECT) || (this->_mh_state == MHS_IN_OUTGOING_CALL)) {
+          || (this->_mh_state == MHS_WAIT_INCOMING_CONNECT) || (this->_mh_state == MHS_WAIT_FAREND_SUPV) ||
+             (this->_mh_state == MHS_IN_OUTGOING_CALL)) {
             this->_mh_state_advance = REG_DROP_CALL;
           }
           break;
