@@ -8,14 +8,19 @@ namespace ENM {
 
 void ENM::_set_send(bool state) {
   digitalWrite(SEND, state);
-  digitalWrite(LED_ORIG_OFHN, !state);
 }
 
 bool ENM::_get_sense()  {
   bool res = !digitalRead(SENSE);
-  digitalWrite(LED_TERM_OFHN, !res);
   return res;
 
+}
+
+void ENM::_reset_trunk(void) {
+  this->_set_send(false);
+  digitalWrite(ATTEN, LOW);
+  this->_mh_state = this->_mh_state_prev = MHS_IDLE;
+  this->_event_buffer.head = this->_event_buffer.tail = 0;
 }
 
 /*
@@ -539,7 +544,8 @@ void ENM::loop() {
 
         case REG_DROP_CALL: // Drop connected call
           if((this->_mh_state == MHS_IN_INCOMING_CALL) || (this->_mh_state == MHS_WAIT_SEND_ADDRESS_INFO) 
-          || (this->_mh_state == MHS_WAIT_INCOMING_CONNECT) || (this->_mh_state == MHS_IN_OUTGOING_CALL)) {
+          || (this->_mh_state == MHS_WAIT_INCOMING_CONNECT) || (this->_mh_state == MHS_WAIT_FAREND_SUPV) ||
+             (this->_mh_state == MHS_IN_OUTGOING_CALL)) {
             this->_mh_state_advance = REG_DROP_CALL;
           }
           break;
@@ -549,6 +555,10 @@ void ENM::loop() {
           if(this->_mh_state == MHS_WAIT_SEND_ADDRESS_INFO) {
             this->_mh_state_advance = REG_OUTGOING_ADDR_COMPLETE;
           }
+          break;
+
+        case REG_RESET:
+          this->_reset_trunk();
           break;
 
         default:
